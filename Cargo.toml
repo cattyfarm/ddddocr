@@ -52,6 +52,7 @@ salvo = { version = "0.85", features = [
   "rustls",
   "acme",
   "logging",
+  "cors",
 ] }
 salvo_extra = { version = "0.85.0", default-features = false, features = [
   "logging",

@@ -1,0 +1,10 @@
+FROM rust:1.96-alpine AS build
+RUN apk add --no-cache build-base musl-dev perl make openssl-dev openssl-libs-static pkgconfig git cmake linux-headers
+WORKDIR /src
+COPY . .
+RUN cargo build --release
+
+FROM alpine:3.20
+COPY --from=build /src/target/release/ddddocr /usr/local/bin/ddddocr
+EXPOSE 18000
+ENTRYPOINT ["ddddocr", "--address", "0.0.0.0:18000", "--ocr"]

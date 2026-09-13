@@ -18,7 +18,9 @@ use rmcp::model::JsonRpcVersion2_0;
 use rmcp::model::ListToolsResult;
 use rmcp::ErrorData;
 use salvo::catcher::Catcher;
+use salvo::cors::{AllowOrigin, Cors};
 use salvo::http::request;
+use salvo::http::Method;
 use salvo::http::ReqBody;
 use salvo::http::ResBody;
 use salvo::oapi::extract::JsonBody;
@@ -659,7 +661,15 @@ async fn main() {
         .unshift(docs.into_router("/docs.json"))
         .unshift(SwaggerUi::new("/docs.json").into_router("/docs"));
 
-    let service = Service::new(router).catcher(Catcher::default().hoop(default_error_handler));
+    let cors = Cors::new()
+        .allow_origin(AllowOrigin::any())
+        .allow_methods(vec![Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers("content-type")
+        .into_handler();
+
+    let service = Service::new(router)
+        .hoop(cors)
+        .catcher(Catcher::default().hoop(default_error_handler));
 
     request::set_global_secure_max_size(50 * 1024 * 1024);
 
